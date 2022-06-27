@@ -5,6 +5,8 @@ from typing import Optional
 class DogBase(BaseModel):
     name: str
     bio: str
+    sex: bool
+    age: int
     
 class DogCreate(DogBase):
     pass
@@ -18,6 +20,8 @@ class Dog(BaseModel):
         orm_mode=True
         
 class DogOut(DogBase):
-    Dog: Dog
+    id: int
+    class Config:
+        orm_mode=True
     
     

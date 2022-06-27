@@ -14,3 +14,4 @@ class Dog(Base):
     bio = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
