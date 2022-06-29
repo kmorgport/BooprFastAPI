@@ -1,3 +1,4 @@
+from email.policy import HTTP
 from fastapi import Depends, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -26,3 +27,47 @@ async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db)):
     db.commit()
     db.refresh(new_dog)
     return new_dog
+
+@router.get("/{id}", response_model=Dogs.DogOut)
+async def get_pup(id: int, db: Session = Depends(database.get_db)):
+    
+    dog = db.query(model.Dog).filter(model.Dog.id == id).first()
+    
+    if not dog:
+        raise HTTPException(status_code= status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id: {id} was not found")
+        
+    return dog
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_post(id: int, db: Session = Depends(database.get_db)):
+    
+    deleted_pup = db.query(model.Dog).filter(model.Dog.id == id)
+    
+    pup = deleted_pup.first()
+    
+    if pup == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Not authorized to perform requested action")
+        
+    deleted_pup.delete(synchronize_session=False)
+    db.commit()
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.put("/{id}")
+async def update_post(id: int, updated_dog:Dogs.DogOut, db: Session = Depends(database.get_db)):
+    
+    dog_query = db.query(model.Dog).filter(model.Dog.id == id)
+    
+    dog = dog_query.first()
+    
+    if dog == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Post with id{id} does not exist ")
+        
+    dog_query.update(updated_dog.dict(), synchronize_session=False)
+    
+    db.commit()
+    
+    return dog_query.first()

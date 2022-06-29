@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from schemas import Users
 from database import database, utilities
@@ -22,7 +22,12 @@ async def create_user( user: Users.UserCreate, db: Session = Depends(database.ge
 
 @router.get('/{id}')
 async def get_user(id: int, db: Session = Depends(database.get_db)):
-    return {"message" : f'User No {id}'}
+    user = db.query(User.User).filter(User.User.id == id).first()
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id:{id} does not exist.")
+    
+    return user
 
 
     
