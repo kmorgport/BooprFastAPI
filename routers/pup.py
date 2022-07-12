@@ -3,10 +3,12 @@ from fastapi import Depends, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import  List, Optional
+from models.Dog import Dog
 
 from schemas import Dogs
 from database import database
-from models import Dog as model
+# from models import Dog as model
+from models import *
 
 router = APIRouter(
     prefix="/dogs",
@@ -15,14 +17,14 @@ router = APIRouter(
 
 @router.get("/", response_model=List[Dogs.DogOut])
 async def get_dogs(db: Session = Depends(database.get_db), search: Optional[str]=""):
-    dogs = db.query(model.Dog).filter(model.Dog.name.contains(search)).all()
+    dogs = db.query(Dog).filter(Dog.name.contains(search)).all()
     
     return dogs
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Dogs.Dog)
 async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db)):
     
-    new_dog = model.Dog(owner_id=1, **dog.dict())
+    new_dog = Dog(owner_id=1, **dog.dict())
     db.add(new_dog)
     db.commit()
     db.refresh(new_dog)
@@ -31,7 +33,7 @@ async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db)):
 @router.get("/{id}", response_model=Dogs.DogOut)
 async def get_pup(id: int, db: Session = Depends(database.get_db)):
     
-    dog = db.query(model.Dog).filter(model.Dog.id == id).first()
+    dog = db.query(Dog).filter(Dog.id == id).first()
     
     if not dog:
         raise HTTPException(status_code= status.HTTP_404_NOT_FOUND,
@@ -42,7 +44,7 @@ async def get_pup(id: int, db: Session = Depends(database.get_db)):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(id: int, db: Session = Depends(database.get_db)):
     
-    deleted_pup = db.query(model.Dog).filter(model.Dog.id == id)
+    deleted_pup = db.query(Dog).filter(Dog.id == id)
     
     pup = deleted_pup.first()
     
@@ -58,7 +60,7 @@ async def delete_post(id: int, db: Session = Depends(database.get_db)):
 @router.put("/{id}")
 async def update_post(id: int, updated_dog:Dogs.DogOut, db: Session = Depends(database.get_db)):
     
-    dog_query = db.query(model.Dog).filter(model.Dog.id == id)
+    dog_query = db.query(Dog).filter(Dog.id == id)
     
     dog = dog_query.first()
     
