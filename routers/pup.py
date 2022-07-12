@@ -8,6 +8,10 @@ from models.Dog import Dog
 from schemas import Dogs
 from database import database
 # from models import Dog as model
+from models import Dog
+from models import Breed
+from models import Boop
+from models import Image
 from models import *
 
 router = APIRouter(
