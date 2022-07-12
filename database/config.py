@@ -1,5 +1,5 @@
 from pydantic import BaseSettings
-
+from models import *
 class Settings(BaseSettings):
     database_hostname: str
     database_port: str
