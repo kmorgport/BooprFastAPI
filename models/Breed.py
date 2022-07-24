@@ -2,6 +2,7 @@ from database.database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from .joinTables import breed_table
+import models.Dog
 
 class Breed(Base):
     __tablename__ = "breeds"

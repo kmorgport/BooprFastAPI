@@ -30,6 +30,17 @@ class Dog(BaseModel):
     class Config:
         orm_mode=True
         
+class DogUpdate(BaseModel):
+    name: Optional[str]
+    sex: Optional[bool]
+    bio: Optional[str]
+    age: Optional[int]
+    breeds: list[Breed]
+    images: Optional[list[Image]]
+    
+    class Config:
+        orm_mode=True
+        
 class DogOut(DogBase):
     id: int
     name: str

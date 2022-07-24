@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+import models.Dog
+import models.User
 
 class Image(Base):
     __tablename__ = "images"
@@ -16,4 +18,4 @@ class Image(Base):
     dog = relationship("Dog", back_populates="images")
     #ManyToOne
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user = relationship("Users", back_populates="dogs")
+    user = relationship("User", back_populates="images")

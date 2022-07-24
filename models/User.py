@@ -4,6 +4,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+from models import *
+import models.Dog
+import models.Image
+import models.Boop
 
 class User(Base):
     __tablename__ = "users"

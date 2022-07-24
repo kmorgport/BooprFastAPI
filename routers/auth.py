@@ -6,6 +6,7 @@ from database import database, utilities, oauth2
 from models import User
 from schemas import Users, Token
 
+
 router = APIRouter(
     prefix="/login",
     tags=['Authentication']

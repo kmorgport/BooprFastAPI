@@ -1,9 +1,9 @@
-from email.policy import HTTP
 from fastapi import Depends, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import  List, Optional
 from models.Dog import Dog
+from database.oauth2 import get_current_user
 
 from schemas import Dogs
 from database import database
@@ -26,9 +26,9 @@ async def get_dogs(db: Session = Depends(database.get_db), search: Optional[str]
     return dogs
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Dogs.Dog)
-async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db)):
+async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db), current_user: int = Depends(get_current_user)):
     
-    new_dog = Dog(owner_id=1, **dog.dict())
+    new_dog = Dog(owner_id=current_user.id, **dog.dict())
     db.add(new_dog)
     db.commit()
     db.refresh(new_dog)
@@ -62,7 +62,7 @@ async def delete_post(id: int, db: Session = Depends(database.get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}")
-async def update_post(id: int, updated_dog:Dogs.DogOut, db: Session = Depends(database.get_db)):
+async def update_post(id: int, updated_dog:Dogs.DogCreate, db: Session = Depends(database.get_db)):
     
     dog_query = db.query(Dog).filter(Dog.id == id)
     

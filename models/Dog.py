@@ -4,7 +4,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-
+from models import *
+import models.Image
+import models.Breed
 from .joinTables import breed_table
 
 class Dog(Base):
@@ -25,4 +27,4 @@ class Dog(Base):
     images = relationship("Image", back_populates="dog")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    owner = relationship("Users", back_populates="dogs")
+    owner = relationship("User", back_populates="dogs")
