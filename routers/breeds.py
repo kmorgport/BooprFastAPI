@@ -1,6 +1,6 @@
 from fastapi import Depends, Response, status, HTTPException, Depends, APIRouter
+from requests import delete
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 from typing import  List, Optional
 from models.Dog import Dog
 
@@ -30,3 +30,24 @@ async def create_breed(breed:Breeds.BreedCreate, db: Session = Depends(database.
     db.commit()
     db.refresh(new_breed)
     return new_breed
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_breed(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    
+    deleted_breed = db.query(Breed).filter(Breed.id == id)
+    print(deleted_breed)
+    
+    breed = deleted_breed.first()
+    
+    if breed == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Breed with id: {id} does not exist")
+        
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Not authorized to perform requested action")
+        
+    deleted_breed.delete(synchronize_session=False)
+    db.commit()
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
