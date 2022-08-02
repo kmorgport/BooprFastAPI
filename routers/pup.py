@@ -8,11 +8,12 @@ from database.oauth2 import get_current_user
 from schemas import Dogs
 from database import database
 # from models import Dog as model
-from models import Dog
-from models import Breed
-from models import Boop
-from models import Image
-from models import *
+from models.Dog import Dog
+from models.Breed import Breed
+from models.Boop import Boop
+from models.Image import Image
+from models.Dog_Breeds import Dog_Breeds
+
 
 router = APIRouter(
     prefix="/dogs",
@@ -25,14 +26,24 @@ async def get_dogs(db: Session = Depends(database.get_db), search: Optional[str]
     
     return dogs
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Dogs.Dog)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Dogs.DogOut)
 async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db), current_user: int = Depends(get_current_user)):
-    
-    new_dog = Dog(owner_id=current_user.id, **dog.dict())
+    print(dog)
+    new_dog = Dog(owner_id=current_user.id, name=dog.name, sex=dog.sex, bio=dog.bio, age=dog.age )
     db.add(new_dog)
     db.commit()
     db.refresh(new_dog)
-    return new_dog
+    for breed in dog.breeds:
+        new_join_table_entry = Dog_Breeds(dog_id=new_dog.id, breed_id=breed.id)
+        db.add(new_join_table_entry)
+        db.commit()
+        db.refresh(new_join_table_entry)
+    
+    dog_query = db.query(Dog).filter(Dog.id == new_dog.id).first()
+    
+    return dog_query
+    
+    
 
 @router.get("/{id}", response_model=Dogs.DogOut)
 async def get_pup(id: int, db: Session = Depends(database.get_db)):

@@ -12,10 +12,6 @@ class Image(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     url = Column(String, nullable=False)
     #OneToMany
-    boops = relationship("Boop", back_populates="image")
+    boops = relationship("Boop")
     #ManyToOne
     dog_id = Column(Integer, ForeignKey("dogs.id", ondelete="CASCADE"), nullable=False)
-    dog = relationship("Dog", back_populates="images")
-    #ManyToOne
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user = relationship("User", back_populates="images")

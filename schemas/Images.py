@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, conint
-from typing import Optional
+from typing import Optional, List
 
 from schemas.Boops import Boop
 
@@ -12,7 +12,7 @@ class Image(BaseModel):
     url: str
     user_id: int
     dog_id: int
-    boops: Optional[list[Boop]] = None
+    boops: Optional[List[Boop]] = None
     
     class Config: 
         orm_mode=True

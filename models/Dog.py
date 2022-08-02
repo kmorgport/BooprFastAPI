@@ -4,10 +4,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-from models import *
-import models.Image
-import models.Breed
-from .joinTables import breed_table
+import models.Image as Image
+import models.Breed as Breed
 
 class Dog(Base):
     __tablename__ = "dogs"
@@ -18,13 +16,8 @@ class Dog(Base):
     bio = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     # ManyToMany
-    breeds = relationship(
-        #String matches Class Name
-        #back_populates matches field name in joined class
-        "Breed", secondary=breed_table, back_populates="dogs"
-    )
+    breeds = relationship("Dog_Breeds", back_populates="dogs")
     # OneToMany
-    images = relationship("Image", back_populates="dog")
+    images = relationship("Image")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    owner = relationship("User", back_populates="dogs")

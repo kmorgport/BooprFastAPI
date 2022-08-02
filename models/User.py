@@ -17,6 +17,5 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     #OneToMany
-    dogs = relationship("Dog", back_populates="owner")
-    images = relationship("Image", back_populates="user")
-    boops = relationship("Boop", back_populates="user")
+    dogs = relationship("Dog")
+    boops = relationship("Boop")

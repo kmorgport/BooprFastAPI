@@ -1,45 +1,48 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, conint
-from typing import List, Optional
-from schemas.Breeds import Breed
+from typing import TYPE_CHECKING, List, Optional
+    
 
-from schemas.Images import Image, ImageBase
 
 class DogBase(BaseModel):
     name: str
     bio: str
     sex: bool
     age: int
-    breeds: list[Breed]
-    images: Optional[list[Image]] = None
+
+    class Config:
+        orm_mode=True
+        allow_population_by_field_name = True
     
-class DogCreate(DogBase):
-    pass
 
 class Dog(BaseModel):
-    id: int
     name: str
     sex: bool
     bio: str
     age: int
-    breeds: list[Breed]
-    created_at: datetime
-    owner_id: int
-    images: Optional[list[Image]] = None
     
     class Config:
         orm_mode=True
+        allow_population_by_field_name = True
+        
+class DogCreate(DogBase):
+    breeds: "tuple[Breed]"
+        
+    class Config:
+        orm_mode=True
+        allow_population_by_field_name = True
         
 class DogUpdate(BaseModel):
     name: Optional[str]
     sex: Optional[bool]
     bio: Optional[str]
     age: Optional[int]
-    breeds: list[Breed]
-    images: Optional[list[Image]]
+    breeds: "tuple[Breed]"
+    images: "Optional[tuple[Image]]"
     
     class Config:
         orm_mode=True
+        allow_population_by_field_name = True
         
 class DogOut(DogBase):
     id: int
@@ -47,11 +50,18 @@ class DogOut(DogBase):
     sex: bool
     bio: str
     age: int
-    breeds: list[Breed]
+    breeds: "Optional[list[Breed]]" = None
     created_at: datetime
     owner_id: int
-    images: Optional[list[Image]] = None
-    class Config:
-        orm_mode=True
+    images: "Optional[list[Image]]" = None
     
-    
+from Breeds import Breed
+from Images import Image
+DogOut.update_forward_refs()
+
+from Breeds import Breed
+from Images import Image
+DogUpdate.update_forward_refs()
+
+from Breeds import Breed
+DogCreate.update_forward_refs()

@@ -1,10 +1,12 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, conint
-from typing import Optional
-from schemas.Boops import Boop
+from typing import TYPE_CHECKING, Optional, List
 
-from schemas.Dogs import Dog
-from schemas.Images import Image
+if TYPE_CHECKING:
+    from schemas.Boops import Boop
+
+import Images
+
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -19,9 +21,6 @@ class User(BaseModel):
     email: EmailStr
     created_at: datetime
     username: str
-    dogs: Optional[list[Dog]] = None
-    images: Optional[list[Image]] = None
-    boops: Optional[list[Boop]] = None
     
     class Config:
         orm_mode = True
@@ -30,6 +29,7 @@ class UserOut(BaseModel):
     id: int
     email: EmailStr
     created_at: datetime
+    dogs: "List[Dog]"
     
     class Config:
         orm_mode = True
@@ -37,3 +37,6 @@ class UserOut(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    
+from Dogs import Dog
+UserOut.update_forward_refs()
