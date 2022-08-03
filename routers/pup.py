@@ -53,6 +53,8 @@ async def post_dog(dog: Dogs.DogCreate, db: Session = Depends(database.get_db), 
 async def get_pup(id: int, db: Session = Depends(database.get_db)):
     
     dog = db.query(Dog).filter(Dog.id == id).first()
+    breeds = breeds = db.query(Breed).filter(Dog_Breeds.breed_id == Breed.id, Dog_Breeds.dog_id == Dog.id).filter(Dog.id == dog.id).all()
+    dog.breeds = breeds
     
     if not dog:
         raise HTTPException(status_code= status.HTTP_404_NOT_FOUND,
@@ -76,19 +78,27 @@ async def delete_post(id: int, db: Session = Depends(database.get_db)):
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.put("/{id}")
-async def update_post(id: int, updated_dog:Dogs.DogCreate, db: Session = Depends(database.get_db)):
+@router.patch("/{id}")
+async def update_post(id: int, updated_dog:Dogs.DogOptional, db: Session = Depends(database.get_db)):
     
     dog_query = db.query(Dog).filter(Dog.id == id)
-    
     dog = dog_query.first()
+    breed_query = db.query(Breed).filter(Dog_Breeds.breed_id == Breed.id, Dog_Breeds.dog_id == Dog.id).filter(Dog.id == id).all()
     
-    if dog == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with id{id} does not exist ")
-        
-    dog_query.update(updated_dog.dict(), synchronize_session=False)
+    print(dog_query.first().id)
     
-    db.commit()
+    # for breed in breed_query:
+    ##Make this a separate end point due to complexity of swapping different breeds 
     
-    return dog_query.first()
+    # dog = dog_query.first()
+    
+    # if dog == None:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Post with id{id} does not exist ")
+    # print(updated_dog)
+    # dog_query.update({"name":updated_dog.name, "sex":updated_dog.sex,"bio":updated_dog.bio,"age":updated_dog.age}, synchronize_session=False)
+    
+    
+    # db.commit()
+    
+    # return dog_query.first()

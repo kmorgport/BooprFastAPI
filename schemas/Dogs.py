@@ -26,23 +26,27 @@ class Dog(BaseModel):
         allow_population_by_field_name = True
         
 class DogCreate(DogBase):
-    breeds: "tuple[Breed]"
+    breeds: "list[Breed]"
         
     class Config:
         orm_mode=True
         allow_population_by_field_name = True
         
 class DogUpdate(BaseModel):
-    name: Optional[str]
-    sex: Optional[bool]
-    bio: Optional[str]
-    age: Optional[int]
-    breeds: "tuple[Breed]"
-    images: "Optional[tuple[Image]]"
+    name: Optional[str] = None
+    sex: Optional[bool] = None
+    bio: Optional[str] = None
+    age: Optional[int] = None
+    # breeds: "Optional[list[Breed]]" = None
+    # images: "Optional[list[Image]]" = None
     
     class Config:
         orm_mode=True
         allow_population_by_field_name = True
+        
+class DogOptional(DogCreate):
+    __annotations__ = {k: Optional[v] for k, v in DogCreate.__annotations__.items()}
+    
         
 class DogOut(DogBase):
     id: int
@@ -65,3 +69,6 @@ DogUpdate.update_forward_refs()
 
 from Breeds import Breed
 DogCreate.update_forward_refs()
+
+from Breeds import Breed
+DogOptional.update_forward_refs()
