@@ -24,6 +24,10 @@ router = APIRouter(
 async def get_dogs(db: Session = Depends(database.get_db), search: Optional[str]=""):
     dogs = db.query(Dog).filter(Dog.name.contains(search)).all()
     
+    for dog in dogs:
+        breeds = db.query(Breed).filter(Dog_Breeds.breed_id == Breed.id, Dog_Breeds.dog_id == Dog.id).filter(Dog.id == dog.id).all()
+        dog.breeds = breeds
+            
     return dogs
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Dogs.DogOut)
