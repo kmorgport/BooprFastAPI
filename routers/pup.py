@@ -5,7 +5,7 @@ from typing import  List, Optional
 from models.Dog import Dog
 from database.oauth2 import get_current_user
 
-from schemas import Dogs
+from schemas import Dogs, Breeds
 from database import database
 # from models import Dog as model
 from models.Dog import Dog
@@ -78,27 +78,31 @@ async def delete_post(id: int, db: Session = Depends(database.get_db)):
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.patch("/{id}")
+@router.patch("/{id}",response_model=Dogs.DogOut)
 async def update_post(id: int, updated_dog:Dogs.DogOptional, db: Session = Depends(database.get_db)):
     
     dog_query = db.query(Dog).filter(Dog.id == id)
-    dog = dog_query.first()
-    breed_query = db.query(Breed).filter(Dog_Breeds.breed_id == Breed.id, Dog_Breeds.dog_id == Dog.id).filter(Dog.id == id).all()
+    dog_check = dog_query.first()
+    if dog_check == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Dog with id{id} does not exist ")
     
-    print(dog_query.first().id)
+    dog = {
+        "name":updated_dog.name,
+        "bio": updated_dog.bio,
+        "age": updated_dog.age,
+        "sex":updated_dog.sex,
+    }
+    db.query(Dog_Breeds).filter(Dog_Breeds.dog_id == id).delete()
+    for breed in updated_dog.breeds:
+        new_join_table_entry = Dog_Breeds(dog_id=id, breed_id=breed.id)
+        db.add(new_join_table_entry)
+        db.commit()
+        db.refresh(new_join_table_entry)
+    dog_query.update(dog, synchronize_session=False)
+    updated_dog = dog_query.first()
+    db.commit()
+    breeds = breeds = db.query(Breed).filter(Dog_Breeds.breed_id == Breed.id, Dog_Breeds.dog_id == Dog.id).filter(Dog.id == id).all()
+    updated_dog.breeds = breeds
+    return updated_dog
     
-    # for breed in breed_query:
-    ##Make this a separate end point due to complexity of swapping different breeds 
-    
-    # dog = dog_query.first()
-    
-    # if dog == None:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"Post with id{id} does not exist ")
-    # print(updated_dog)
-    # dog_query.update({"name":updated_dog.name, "sex":updated_dog.sex,"bio":updated_dog.bio,"age":updated_dog.age}, synchronize_session=False)
-    
-    
-    # db.commit()
-    
-    # return dog_query.first()

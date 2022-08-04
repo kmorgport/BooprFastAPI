@@ -51,3 +51,18 @@ async def delete_breed(id: int, db: Session = Depends(database.get_db), current_
     db.commit()
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.put("/{id}")
+async def update_breed(id: int, updated_breed: Breeds.BreedCreate, db: Session = Depends(database.get_db), user_id: int = Depends(oauth2.get_current_user)):
+    breed_query = db.query(Breed).filter(Breed.id == id)
+    
+    breed = breed_query.first()
+    
+    if breed == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Breed with id{id} does not exist ")
+    breed_query.update(updated_breed.dict(), synchronize_session=False)
+    
+    db.commit()
+    
+    return breed_query.first()

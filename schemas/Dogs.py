@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, conint
+from pydantic import BaseModel, EmailStr, conint, fields
 from typing import TYPE_CHECKING, List, Optional
     
 
@@ -37,8 +37,8 @@ class DogUpdate(BaseModel):
     sex: Optional[bool] = None
     bio: Optional[str] = None
     age: Optional[int] = None
-    # breeds: "Optional[list[Breed]]" = None
-    # images: "Optional[list[Image]]" = None
+    breeds: "Optional[list[Breed]]" = None
+    images: "Optional[list[Image]]" = None
     
     class Config:
         orm_mode=True
